@@ -2,15 +2,26 @@
 
 namespace Deg540\PHPTestingBoilerplate;
 
+use function PHPUnit\Framework\isEmpty;
+
 class Calculator
 {
-    function add(int $number1, int $number2): int
+    public function calculate(string $stringWithNumbers): string
     {
-        return 0;
+        if(empty($stringWithNumbers)){
+            return "0";
+        }
+        elseif (is_numeric($stringWithNumbers)){
+            return $stringWithNumbers;
+        }
+        else{
+            $suma=0;
+            $porciones =explode(",",$stringWithNumbers);
+            foreach ($porciones as $stringNumber){
+                $suma=$suma+floatval($stringNumber);
+            }
+            return strval("$suma");
+        }
     }
 
-    function multiply(int $number1, int $number2): int
-    {
-        return 0;
-    }
 }

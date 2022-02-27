@@ -12,24 +12,32 @@ final class CalculatorTest extends TestCase
     /**
      * @test
      */
-    public function shouldAddTwoArguments()
-    {
+    public function empty_number(){
         $calculator = new Calculator();
 
-        $result = $calculator->add(1, 2);
+        $result = $calculator->calculate("");
 
-        $this->assertEquals(3, $result);
+        $this->assertEquals("0", $result);
     }
-
     /**
      * @test
      */
-    public function shouldMultiplyTwoArguments()
-    {
+    public function given_1_number(){
         $calculator = new Calculator();
 
-        $result = $calculator->multiply(1, 2);
+        $result = $calculator->calculate("1.1");
 
-        $this->assertEquals(2, $result);
+        $this->assertEquals("1.1", $result);
     }
+    /**
+     * @test
+     */
+    public function given_multiple_number(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("1.1,2.3,7");
+
+        $this->assertEquals("10.4", $result);
+    }
+
 }
