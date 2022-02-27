@@ -39,5 +39,26 @@ final class CalculatorTest extends TestCase
 
         $this->assertEquals("10.4", $result);
     }
+    /**
+     * @test
+     */
+    public function given_wrong_newline(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("175.2,\n35");
+
+        $this->assertEquals("Number expected but '\n' found at position 6.", $result);
+    }
+    /**
+     * @test
+     */
+    public function given_correct_newline(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("1\n2,3");
+
+        $this->assertEquals("6", $result);
+    }
+
 
 }
