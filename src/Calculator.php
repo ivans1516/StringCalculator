@@ -6,8 +6,10 @@ namespace Deg540\PHPTestingBoilerplate;
 
 class Calculator
 {
+
     public function calculate(string $stringToOperate): string
     {
+        $errorsArray=array();
         if(empty($stringToOperate)) {
             return 0;
         }
@@ -27,11 +29,9 @@ class Calculator
                 if($tokensCounter>1){
                     $actualPosition=$actualPosition+1;
                 }
-                if(empty($token)){
-                    return "Number expected but EOF found.";
-                }
-                elseif(str_starts_with($token,"\n")){
-                    return "Number expected but '\n' found at position ".$actualPosition.".";
+                if(str_starts_with($token,"\n")){
+                    $errorsArray[] = "Number expected but '\n' found at position " . $actualPosition . ".";
+                    $actualPosition=$actualPosition+strlen($token);
                 }
                 else{
                     $newlineTokens=explode("\n",$token);
@@ -43,30 +43,40 @@ class Calculator
                         }
                         if(empty($newlineToken)){
                             if(strlen($stringToOperate)<=$actualPosition){
-                                return "Number expected but EOF found.";
+                                $errorsArray[] = "Number expected but EOF found.";
                             }
                             else{
-                                return "Number expected but '".$delimiter."'"." found at position ".$actualPosition;
+                                $errorsArray[] = "Number expected but '" . $delimiter . "'" . " found at position " . $actualPosition;
                             }
                         }
-                        if(is_numeric($newlineToken)){
-                            $result=$result+floatval($newlineToken);
-                        }
                         else{
-                            for ($newlineTokenCharacter = 0; $newlineTokenCharacter < strlen($newlineToken); $newlineTokenCharacter++) {
-                                if(!(is_numeric($newlineToken[$newlineTokenCharacter]) or $newlineToken[$newlineTokenCharacter]==".")){
-                                    return "'".$delimiter."'"." expected but '".$newlineToken[$newlineTokenCharacter]."'"." found at position ".$actualPosition+$newlineTokenCharacter.".";
+                            if(is_numeric($newlineToken)){
+                                if(str_contains($newlineToken,"-")){
+                                    for ($newlineTokenCharacter = 0; $newlineTokenCharacter < strlen($newlineToken); $newlineTokenCharacter++) {
+                                        if($newlineToken[$newlineTokenCharacter]=="-"){
+                                            $errorsArray[] = "Negative not allowed: " . $newlineToken[$newlineTokenCharacter] . $newlineToken[$newlineTokenCharacter + 1];
+                                        }
+                                    }
+                                }
+                                else{
+                                    $result=$result+floatval($newlineToken);
+                                }
+                            }
+                            else{
+                                for ($newlineTokenCharacter = 0; $newlineTokenCharacter < strlen($newlineToken); $newlineTokenCharacter++) {
+                                    if(!(is_numeric($newlineToken[$newlineTokenCharacter]) or $newlineToken[$newlineTokenCharacter]=="."))
+                                    $errorsArray[] = "'" . $delimiter . "'" . " expected but '" . $newlineToken[$newlineTokenCharacter] . "'" . " found at position " . $actualPosition + $newlineTokenCharacter . ".";
                                 }
                             }
                         }
                         $actualPosition=$actualPosition+strlen($newlineToken);
-
                     }
                 }
             }
-            return strval("$result");
+            return $this->show_results($errorsArray,$result);
         }
     }
+
     private function get_Delimiter_Indexes($stringToOperate):int{
         if(str_starts_with($stringToOperate,"//") and str_contains($stringToOperate,"\n")){
             return strpos($stringToOperate,"\n");
@@ -75,6 +85,7 @@ class Calculator
             return 0;
         }
     }
+
     private function get_Delimiter($stringToOperate,$delimiter_position):string
     {
         if($delimiter_position>0){
@@ -82,6 +93,20 @@ class Calculator
         }
         else{
             return ",";
+        }
+    }
+
+    private function show_results($errorsArray,$result):string
+    {
+        if(empty($errorsArray)){
+            return strval($result);
+        }
+        else{
+            $errorsMessage="";
+            foreach ($errorsArray as &$error) {
+                $errorsMessage = $errorsMessage.$error."\n";
+            }
+            return substr($errorsMessage,0,-1);
         }
     }
 

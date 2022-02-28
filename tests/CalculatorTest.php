@@ -110,6 +110,27 @@ final class CalculatorTest extends TestCase
 
         $this->assertEquals("'|' expected but ',' found at position 7.", $result);
     }
+    /**
+     * @test
+     */
+    public function negative_errors_1(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("-1,2");
+
+        $this->assertEquals("Negative not allowed: -1",$result);
+    }
+    /**
+     * @test
+     */
+    public function mutiple_errors_1(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("-1,,2");
+
+        $this->assertEquals("Negative not allowed: -1\nNumber expected but ',' found at position 3",$result);
+    }
+
 
 
 }
