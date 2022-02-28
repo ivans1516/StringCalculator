@@ -7,73 +7,74 @@ namespace Deg540\PHPTestingBoilerplate;
 class Calculator
 {
 
+
     public function calculate(string $stringToOperate): string
     {
         $errorsArray=array();
-        if(empty($stringToOperate)) {
+        if(empty($stringToOperate))
             return 0;
-        }
         else{
-            $result=0;
-            $actualPosition=0;
+            $finalResult=0;
+            $actualStringPosition=0;
             $delimiterPosition=$this->get_Delimiter_Indexes($stringToOperate);
             $delimiter=$this->get_Delimiter($stringToOperate,$delimiterPosition);
             if($delimiterPosition>0){
-                $actualPosition=$delimiterPosition+1;
+                $actualStringPosition=$delimiterPosition+1;
             }
-
-            $tokens =explode($delimiter,substr($stringToOperate,$actualPosition,strlen($stringToOperate)-$actualPosition));
-            $tokensCounter=0;
-            foreach ($tokens as $token){
-                $tokensCounter=$tokensCounter+1;
-                if($tokensCounter>1){
-                    $actualPosition=$actualPosition+1;
+            $tokensByDelimiter =explode($delimiter,substr($stringToOperate,$actualStringPosition,strlen($stringToOperate)-$actualStringPosition));
+            $tokensByDemiliterCounter=0;
+            foreach ($tokensByDelimiter as $tokenByDemiliter){
+                $tokensByDemiliterCounter=$tokensByDemiliterCounter+1;
+                if($tokensByDemiliterCounter>1){
+                    $actualStringPosition=$actualStringPosition+1;
                 }
-                if(str_starts_with($token,"\n")){
-                    $errorsArray[] = "Number expected but '\n' found at position " . $actualPosition . ".";
-                    $actualPosition=$actualPosition+strlen($token);
+                if(str_starts_with($tokenByDemiliter,"\n")){
+                    $errorsArray[] = "Number expected but '\n' found at position " . $actualStringPosition . ".";
+                    $actualStringPosition=$actualStringPosition+strlen($tokenByDemiliter);
                 }
                 else{
-                    $newlineTokens=explode("\n",$token);
-                    $newlineTokensCounter=0;
-                    foreach ($newlineTokens as $newlineToken){
-                        $newlineTokensCounter=$newlineTokensCounter+1;
-                        if($newlineTokensCounter>1){
-                            $actualPosition=$actualPosition+1;
-                        }
-                        if(empty($newlineToken)){
-                            if(strlen($stringToOperate)<=$actualPosition){
-                                $errorsArray[] = "Number expected but EOF found.";
-                            }
-                            else{
-                                $errorsArray[] = "Number expected but '" . $delimiter . "'" . " found at position " . $actualPosition;
-                            }
+                    $tokensByNewLine=explode("\n",$tokenByDemiliter);
+                    $tokensByNewLineCounter=0;
+                    foreach ($tokensByNewLine as $tokenByNewLine){
+                        $tokensByNewLineCounter=$tokensByNewLineCounter+1;
+                        if($tokensByNewLineCounter>1){
+                            $actualStringPosition=$actualStringPosition+1;
                         }
                         else{
-                            if(is_numeric($newlineToken)){
-                                if(str_contains($newlineToken,"-")){
-                                    for ($newlineTokenCharacter = 0; $newlineTokenCharacter < strlen($newlineToken); $newlineTokenCharacter++) {
-                                        if($newlineToken[$newlineTokenCharacter]=="-"){
-                                            $errorsArray[] = "Negative not allowed: " . $newlineToken[$newlineTokenCharacter] . $newlineToken[$newlineTokenCharacter + 1];
+                            if(empty($tokenByNewLine)){
+                                if(strlen($stringToOperate)<=$actualStringPosition){
+                                    $errorsArray[] = "Number expected but EOF found.";
+                                }
+                                else{
+                                    $errorsArray[] = "Number expected but '" . $delimiter . "'" . " found at position " . $actualStringPosition;
+                                }
+                            }
+                            else{
+                                if(is_numeric($tokenByNewLine)){
+                                    if(str_contains($tokenByNewLine,"-")){
+                                        for ($newlineTokenCharacter = 0; $newlineTokenCharacter < strlen($tokenByNewLine); $newlineTokenCharacter++) {
+                                            if($tokenByNewLine[$newlineTokenCharacter]=="-"){
+                                                $errorsArray[] = "Negative not allowed: " . $tokenByNewLine[$newlineTokenCharacter] . $tokenByNewLine[$newlineTokenCharacter + 1];
+                                            }
                                         }
+                                    }
+                                    else{
+                                        $finalResult=$finalResult+floatval($tokenByNewLine);
                                     }
                                 }
                                 else{
-                                    $result=$result+floatval($newlineToken);
+                                    for ($newlineTokenCharacter = 0; $newlineTokenCharacter < strlen($tokenByNewLine); $newlineTokenCharacter++) {
+                                        if(!(is_numeric($tokenByNewLine[$newlineTokenCharacter]) or $tokenByNewLine[$newlineTokenCharacter]=="."))
+                                            $errorsArray[] = "'" . $delimiter . "'" . " expected but '" . $tokenByNewLine[$newlineTokenCharacter] . "'" . " found at position " . $actualStringPosition + $newlineTokenCharacter . ".";
+                                    }
                                 }
                             }
-                            else{
-                                for ($newlineTokenCharacter = 0; $newlineTokenCharacter < strlen($newlineToken); $newlineTokenCharacter++) {
-                                    if(!(is_numeric($newlineToken[$newlineTokenCharacter]) or $newlineToken[$newlineTokenCharacter]=="."))
-                                    $errorsArray[] = "'" . $delimiter . "'" . " expected but '" . $newlineToken[$newlineTokenCharacter] . "'" . " found at position " . $actualPosition + $newlineTokenCharacter . ".";
-                                }
-                            }
+                            $actualStringPosition=$actualStringPosition+strlen($tokenByNewLine);
                         }
-                        $actualPosition=$actualPosition+strlen($newlineToken);
                     }
                 }
             }
-            return $this->show_results($errorsArray,$result);
+            return $this->show_results($errorsArray,$finalResult);
         }
     }
 

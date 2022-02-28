@@ -9,128 +9,60 @@ use PHPUnit\Framework\TestCase;
 
 final class CalculatorTest extends TestCase
 {
+
     /**
      * @test
      */
-    public function empty_number(){
+    public function empty_String(){
         $calculator = new Calculator();
 
         $result = $calculator->calculate("");
 
         $this->assertEquals("0", $result);
     }
+
     /**
      * @test
      */
-    public function given_1_number(){
+    public function all_errors_posibilities_deafult_separator(){
         $calculator = new Calculator();
 
-        $result = $calculator->calculate("1.1");
+        $result = $calculator->calculate("-1,,2,4.5|6,\n3,");
 
-        $this->assertEquals("1.1", $result);
-    }
-    /**
-     * @test
-     */
-    public function given_multiple_number(){
-        $calculator = new Calculator();
-
-        $result = $calculator->calculate("1.1,2.3,7");
-
-        $this->assertEquals("10.4", $result);
-    }
-    /**
-     * @test
-     */
-    public function given_wrong_newline(){
-        $calculator = new Calculator();
-
-        $result = $calculator->calculate("175.2,\n35");
-
-        $this->assertEquals("Number expected but '\n' found at position 6.", $result);
-    }
-    /**
-     * @test
-     */
-    public function given_correct_newline(){
-        $calculator = new Calculator();
-
-        $result = $calculator->calculate("1\n2,3");
-
-        $this->assertEquals("6", $result);
-    }
-    /**
-     * @test
-     */
-    public function given_missing_number_last_position(){
-        $calculator = new Calculator();
-
-        $result = $calculator->calculate("1,3,");
-
-        $this->assertEquals("Number expected but EOF found.", $result);
+        $this->assertEquals("Negative not allowed: -1\nNumber expected but ',' found at position 3\n',' expected but '|' found at position 9.\nNumber expected but '\n' found at position 12.\nNumber expected but EOF found.", $result);
     }
 
     /**
      * @test
      */
-    public function given_new_separator_return_3(){
+    public function all_errors_posibilities_diferent_separator(){
         $calculator = new Calculator();
 
-        $result = $calculator->calculate("//;\n1;2");
+        $result = $calculator->calculate("//|\n-1||2|4.5,6|\n3|");
 
-        $this->assertEquals("3", $result);
+        $this->assertEquals("Negative not allowed: -1\nNumber expected but '|' found at position 7\n'|' expected but ',' found at position 13.\nNumber expected but '\n' found at position 16.\nNumber expected but EOF found.", $result);
     }
+
     /**
      * @test
      */
-    public function given_new_separator_return_6(){
+    public function all_posibilities_default_separator(){
         $calculator = new Calculator();
 
-        $result = $calculator->calculate("//|\n1|2|3");
+        $result = $calculator->calculate("4.3,5\n,8.1");
 
-        $this->assertEquals("6", $result);
+        $this->assertEquals("17.4",$result);
     }
+
     /**
      * @test
      */
-    public function given_new_separator_return_5(){
+    public function all_posibilities_diferent_separator(){
         $calculator = new Calculator();
 
-        $result = $calculator->calculate("//sep\n2sep3");
+        $result = $calculator->calculate("//|\n4.3|5\n|8.1");
 
-        $this->assertEquals("5", $result);
+        $this->assertEquals("17.4",$result);
     }
-    /**
-     * @test
-     */
-    public function given_new_separator_invalid(){
-        $calculator = new Calculator();
-
-        $result = $calculator->calculate("//|\n1|2,3");
-
-        $this->assertEquals("'|' expected but ',' found at position 7.", $result);
-    }
-    /**
-     * @test
-     */
-    public function negative_errors_1(){
-        $calculator = new Calculator();
-
-        $result = $calculator->calculate("-1,2");
-
-        $this->assertEquals("Negative not allowed: -1",$result);
-    }
-    /**
-     * @test
-     */
-    public function mutiple_errors_1(){
-        $calculator = new Calculator();
-
-        $result = $calculator->calculate("-1,,2");
-
-        $this->assertEquals("Negative not allowed: -1\nNumber expected but ',' found at position 3",$result);
-    }
-
-
 
 }
