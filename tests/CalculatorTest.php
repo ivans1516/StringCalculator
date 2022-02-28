@@ -59,6 +59,57 @@ final class CalculatorTest extends TestCase
 
         $this->assertEquals("6", $result);
     }
+    /**
+     * @test
+     */
+    public function given_missing_number_last_position(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("1,3,");
+
+        $this->assertEquals("Number expected but EOF found.", $result);
+    }
+
+    /**
+     * @test
+     */
+    public function given_new_separator_return_3(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("//;\n1;2");
+
+        $this->assertEquals("3", $result);
+    }
+    /**
+     * @test
+     */
+    public function given_new_separator_return_6(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("//|\n1|2|3");
+
+        $this->assertEquals("6", $result);
+    }
+    /**
+     * @test
+     */
+    public function given_new_separator_return_5(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("//sep\n2sep3");
+
+        $this->assertEquals("5", $result);
+    }
+    /**
+     * @test
+     */
+    public function given_new_separator_invalid(){
+        $calculator = new Calculator();
+
+        $result = $calculator->calculate("//|\n1|2,3");
+
+        $this->assertEquals("'|' expected but ',' found at position 7.", $result);
+    }
 
 
 }
